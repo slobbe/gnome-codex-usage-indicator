@@ -2,13 +2,15 @@
 
 > Monitor your Codex usage directly from the GNOME top bar.
 
+Inspired by [CodexBar](https://github.com/steipete/CodexBar) by [Peter Steinberger](https://github.com/steipete), adapted for GNOME.
+
 ## Install
 
 > [!NOTE]
-> Codex Usage Indicator requires the Codex CLI to be installed and logged in on the same machine.
-> The extension reads your local Codex session from `~/.codex/auth.json`, so it will not work until that file exists.
+> Requires the Codex CLI and an active login on the same machine.
+> The extension reads your local local auth credentials from `~/.codex/auth.json` to fetch usage data.
 
-1. Download the latest release zip from GitHub.
+1. Download the [latest release](https://github.com/slobbe/gnome-codex-usage-indicator/releases/latest) zip.
 2. Install it with:
 
 ```bash
