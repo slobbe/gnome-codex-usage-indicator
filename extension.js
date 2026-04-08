@@ -25,7 +25,7 @@ import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
 import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 import {Extension} from 'resource:///org/gnome/shell/extensions/extension.js';
 
-import {fetchCodexUsageSnapshot} from './codex.js';
+import {fetchCodexUsageSnapshot, readCachedUsageSnapshot} from './codex.js';
 
 const REFRESH_INTERVAL_SECONDS = 60;
 const SETTINGS_SHOW_FIVE_HOUR = 'show-five-hour';
@@ -55,8 +55,10 @@ class CodexUsageIndicator extends PanelMenu.Button {
         this.add_child(this._label);
         this._buildMenu();
         this._connectSignals();
+        this._loadCachedSnapshot();
 
         this._syncLabel();
+        this._syncMenu();
         void this._refreshUsage();
         this._scheduleRefresh();
     }
@@ -231,13 +233,19 @@ class CodexUsageIndicator extends PanelMenu.Button {
             this._snapshot = await fetchCodexUsageSnapshot();
             this._errorMessage = null;
         } catch (error) {
-            this._snapshot = null;
             this._errorMessage = error?.message ?? 'Unable to load Codex usage.';
         } finally {
             this._refreshInFlight = false;
             this._syncLabel();
             this._syncMenu();
         }
+    }
+
+    _loadCachedSnapshot() {
+        const snapshot = readCachedUsageSnapshot();
+
+        if (snapshot)
+            this._snapshot = snapshot;
     }
 
     _syncLabel() {
