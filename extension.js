@@ -30,7 +30,7 @@ import {fetchCodexUsageSnapshot, readCachedUsageSnapshot} from './codex.js';
 const SETTINGS_SHOW_FIVE_HOUR = 'show-five-hour';
 const SETTINGS_SHOW_WEEKLY = 'show-weekly';
 const SETTINGS_BACKGROUND_REFRESH_INTERVAL_MINUTES = 'background-refresh-interval-minutes';
-const MIN_REFRESH_INTERVAL_MINUTES = 1;
+const MIN_REFRESH_INTERVAL_MINUTES = 0;
 
 class CodexUsageIndicator extends PanelMenu.Button {
     static {
@@ -296,6 +296,9 @@ class CodexUsageIndicator extends PanelMenu.Button {
 
         const refreshIntervalSeconds = this._getRefreshIntervalSeconds();
 
+        if (refreshIntervalSeconds <= 0)
+            return;
+
         this._refreshId = GLib.timeout_add_seconds(
             GLib.PRIORITY_DEFAULT,
             refreshIntervalSeconds,
@@ -334,6 +337,9 @@ class CodexUsageIndicator extends PanelMenu.Button {
     _getRefreshIntervalSeconds() {
         const intervalMinutes = this._settings.get_uint(SETTINGS_BACKGROUND_REFRESH_INTERVAL_MINUTES);
         const safeMinutes = Math.max(MIN_REFRESH_INTERVAL_MINUTES, intervalMinutes);
+
+        if (safeMinutes === 0)
+            return 0;
 
         return safeMinutes * 60;
     }

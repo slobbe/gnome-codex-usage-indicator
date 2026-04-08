@@ -14,8 +14,8 @@
     <key name="background-refresh-interval-minutes" type="u">
       <default>1</default>
       <summary>Background refresh interval in minutes</summary>
-      <description>Controls how often the extension refreshes Codex usage data in the background. The minimum value is 1 minute.</description>
-      <range min="1" max="60"/>
+      <description>Controls how often the extension refreshes Codex usage data in the background. Set to 0 to disable scheduled refreshes and rely on manual refresh only.</description>
+      <range min="0" max="60"/>
     </key>
   </schema>
 </schemalist>

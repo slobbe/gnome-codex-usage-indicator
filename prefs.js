@@ -49,7 +49,7 @@ class DisplayPage extends Adw.PreferencesPage {
         );
 
         const intervalAdjustment = new Gtk.Adjustment({
-            lower: 1,
+            lower: 0,
             upper: 60,
             step_increment: 1,
             page_increment: 5,
@@ -58,7 +58,7 @@ class DisplayPage extends Adw.PreferencesPage {
 
         const refreshIntervalRow = new Adw.SpinRow({
             title: 'Background refresh interval',
-            subtitle: 'How often usage data refreshes in the background, in minutes.',
+            subtitle: 'How often usage data refreshes in the background, in minutes. Set to 0 for manual refresh only.',
             adjustment: intervalAdjustment,
             climb_rate: 1,
             digits: 0,
@@ -68,7 +68,7 @@ class DisplayPage extends Adw.PreferencesPage {
         refreshIntervalRow.connect('notify::value', () => {
             settings.set_uint(
                 SETTINGS_BACKGROUND_REFRESH_INTERVAL_MINUTES,
-                Math.max(1, Math.round(refreshIntervalRow.value))
+                Math.max(0, Math.round(refreshIntervalRow.value))
             );
         });
 
