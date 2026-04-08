@@ -247,6 +247,7 @@ class CodexUsageIndicator extends PanelMenu.Button {
         const planLabel = new St.Label({
             text: '--',
             x_expand: true,
+            y_align: Clutter.ActorAlign.CENTER,
             style_class: 'cx-footer-label',
         });
 

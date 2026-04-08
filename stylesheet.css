@@ -9,7 +9,7 @@
 }
 
 .cx-header-item {
-    spacing: 2px;
+    spacing: 1px;
 }
 
 .cx-header-row {
@@ -71,6 +71,7 @@
 
 .cx-footer-row {
     spacing: 12px;
+    min-height: 2.1em;
 }
 
 .cx-footer-label {
