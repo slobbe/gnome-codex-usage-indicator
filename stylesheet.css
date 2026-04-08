@@ -45,11 +45,10 @@
     opacity: 0.75;
 }
 
-.cx-account-row {
+.cx-footer-row {
     spacing: 12px;
 }
 
-.cx-account-label,
-.cx-subscription-label {
+.cx-footer-label {
     font-size: 0.95em;
 }

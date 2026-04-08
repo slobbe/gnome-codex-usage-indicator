@@ -83,14 +83,12 @@ class CodexUsageIndicator extends PanelMenu.Button {
     _buildMenu() {
         this._fiveHourItem = this._createUsageItem('5 hour');
         this._weeklyItem = this._createUsageItem('weekly');
-        this._accountSubscriptionItem = this._createAccountSubscriptionItem();
-        this._updatedItem = this._createInfoItem('Last update: --');
+        this._footerItem = this._createFooterItem();
 
         this.menu.addMenuItem(this._fiveHourItem);
         this.menu.addMenuItem(this._weeklyItem);
         this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
-        this.menu.addMenuItem(this._accountSubscriptionItem);
-        this.menu.addMenuItem(this._updatedItem);
+        this.menu.addMenuItem(this._footerItem);
     }
 
     _createInfoItem(text) {
@@ -169,7 +167,7 @@ class CodexUsageIndicator extends PanelMenu.Button {
         return item;
     }
 
-    _createAccountSubscriptionItem() {
+    _createFooterItem() {
         const item = new PopupMenu.PopupBaseMenuItem({
             reactive: false,
             can_focus: false,
@@ -177,25 +175,25 @@ class CodexUsageIndicator extends PanelMenu.Button {
 
         const box = new St.BoxLayout({
             x_expand: true,
-            style_class: 'cx-account-row',
+            style_class: 'cx-footer-row',
         });
 
-        const accountLabel = new St.Label({
-            text: 'Account: --',
+        const updatedLabel = new St.Label({
+            text: 'Last update: --',
             x_expand: true,
-            style_class: 'cx-account-label',
+            style_class: 'cx-footer-label',
         });
 
         const subscriptionLabel = new St.Label({
-            text: 'Subscription: --',
+            text: '--',
             x_align: Clutter.ActorAlign.END,
-            style_class: 'cx-subscription-label',
+            style_class: 'cx-footer-label',
         });
 
-        box.add_child(accountLabel);
+        box.add_child(updatedLabel);
         box.add_child(subscriptionLabel);
         item.add_child(box);
-        item.accountLabel = accountLabel;
+        item.updatedLabel = updatedLabel;
         item.subscriptionLabel = subscriptionLabel;
 
         return item;
@@ -266,9 +264,8 @@ class CodexUsageIndicator extends PanelMenu.Button {
             const fallback = this._errorMessage ?? 'Loading Codex usage...';
             this._setUsageItem(this._fiveHourItem, '5 hour', fallback, 'resets in --', null);
             this._setUsageItem(this._weeklyItem, 'weekly', '--', 'resets in --', null);
-            this._accountSubscriptionItem.accountLabel.text = 'Account: --';
-            this._accountSubscriptionItem.subscriptionLabel.text = 'Subscription: --';
-            this._updatedItem.label.text = 'Last update: --';
+            this._footerItem.updatedLabel.text = 'Last update: --';
+            this._footerItem.subscriptionLabel.text = '--';
             return;
         }
 
@@ -286,9 +283,8 @@ class CodexUsageIndicator extends PanelMenu.Button {
             formatReset(this._snapshot.weekly, 'weekly'),
             this._snapshot.weekly?.usedPercent
         );
-        this._accountSubscriptionItem.accountLabel.text = `Account: ${shortenAccountId(this._snapshot.subscription?.accountId)}`;
-        this._accountSubscriptionItem.subscriptionLabel.text = `Subscription: ${formatPlan(this._snapshot.subscription?.planType ?? this._snapshot.planType)}`;
-        this._updatedItem.label.text = `Last update: ${formatTimestamp(this._snapshot.fetchedAt)}`;
+        this._footerItem.updatedLabel.text = `Last update: ${formatRelativeTimestamp(this._snapshot.fetchedAt)}`;
+        this._footerItem.subscriptionLabel.text = formatPlan(this._snapshot.subscription?.planType ?? this._snapshot.planType);
     }
 
     _setUsageItem(item, title, value, detail, percentValue) {
@@ -387,6 +383,34 @@ function formatTimestamp(value) {
     }
 }
 
+function formatRelativeTimestamp(value) {
+    if (!value)
+        return '--';
+
+    const timestamp = new Date(value).getTime();
+
+    if (Number.isNaN(timestamp))
+        return '--';
+
+    const diffSeconds = Math.max(0, Math.floor((Date.now() - timestamp) / 1000));
+
+    if (diffSeconds < 45)
+        return 'just now';
+
+    if (diffSeconds < 3600) {
+        const minutes = Math.max(1, Math.floor(diffSeconds / 60));
+        return `${minutes} ${minutes === 1 ? 'min' : 'mins'} ago`;
+    }
+
+    if (diffSeconds < 86400) {
+        const hours = Math.floor(diffSeconds / 3600);
+        return `${hours} ${hours === 1 ? 'hour' : 'hours'} ago`;
+    }
+
+    const days = Math.floor(diffSeconds / 86400);
+    return `${days} ${days === 1 ? 'day' : 'days'} ago`;
+}
+
 function formatPlan(value) {
     if (!value)
         return '--';
@@ -397,13 +421,6 @@ function formatPlan(value) {
         .filter(Boolean)
         .map(part => `${part[0].toUpperCase()}${part.slice(1)}`)
         .join(' ');
-}
-
-function shortenAccountId(value) {
-    if (!value)
-        return '--';
-
-    return value.length > 18 ? `${value.slice(0, 8)}...${value.slice(-6)}` : value;
 }
 
 function normalizePercent(value) {
