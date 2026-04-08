@@ -1,37 +1,32 @@
 # Codex Usage Indicator GNOME Extension
 
-> Monitor your Codex usage directly from the GNOME top bar.
+Monitor your Codex usage directly from the GNOME top bar.
 
-Inspired by [CodexBar](https://github.com/steipete/CodexBar) by [Peter Steinberger](https://github.com/steipete), adapted for GNOME.
+> Inspired by [CodexBar](https://github.com/steipete/CodexBar) by [Peter Steinberger](https://github.com/steipete), adapted for GNOME.
+
+## Features
+
+- Displays current 5-hour and weekly Codex usage
+- Supports manual refresh and configurable background refresh intervals
+- Lets you choose whether the top bar shows 5-hour usage, weekly usage, or both
 
 ## Install
 
 > [!NOTE]
 > Requires the Codex CLI and an active login on the same machine.
-> The extension reads your local local auth credentials from `~/.codex/auth.json` to fetch usage data.
+> The extension reads your local local auth credentials from `~/.codex/auth.json` to fetch usage data from `https://chatgpt.com/backend-api/wham/usage`.
 
 1. Download the [latest release](https://github.com/slobbe/gnome-codex-usage-indicator/releases/latest) zip.
-2. Install it with:
+2. Install and enable the extension with:
 
-```bash
+```sh
 gnome-extensions install codex-usage@slobbe.github.io-<version>.zip --force
-```
-
-3. Enable the extension:
-
-```bash
 gnome-extensions enable codex-usage@slobbe.github.io
-```
-
-4. Open preferences if needed:
-
-```bash
-gnome-extensions prefs codex-usage@slobbe.github.io
 ```
 
 If GNOME does not pick it up immediately, log out and back in.
 
-## Developer / Build
+## Development / Build
 
 For local development, install the extension into your user extensions directory:
 
