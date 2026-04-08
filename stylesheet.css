@@ -80,4 +80,19 @@
 .cx-footer-button {
     padding: 2px;
     margin: 0;
+    border-radius: 999px;
+    background-color: transparent;
+    transition-duration: 150ms;
+}
+
+.cx-footer-button:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+.cx-footer-button:active {
+    background-color: rgba(255, 255, 255, 0.16);
+}
+
+.cx-footer-button:focus {
+    background-color: rgba(255, 255, 255, 0.08);
 }
