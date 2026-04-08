@@ -1,11 +1,13 @@
 {
   "name": "Codex Usage Indicator",
-  "description": "Show current Codex quota usage in the GNOME top bar",
+  "description": "Monitor your Codex usage directly from the GNOME top bar",
   "uuid": "codex-usage@slobbe.github.io",
   "shell-version": [
     "49"
   ],
   "settings-schema": "org.gnome.shell.extensions.codex-usage",
+  "url": "https://github.com/slobbe/gnome-codex-usage-indicator",
+  "license": "GNU General Public License v3.0 or later",
   "version": 1,
   "version-name": "0.1.0"
 }

@@ -110,6 +110,14 @@ class AboutPage extends Adw.PreferencesPage {
             'UUID',
             metadata.uuid ?? '--'
         ));
+        infoGroup.add(this._createInfoRow(
+            'License',
+            metadata.license ?? 'GNU General Public License v3.0 or later'
+        ));
+        infoGroup.add(this._createLinkRow(
+            'GitHub',
+            metadata.url ?? 'https://github.com/slobbe/gnome-codex-usage-indicator'
+        ));
 
         this.add(infoGroup);
 
@@ -124,7 +132,7 @@ class AboutPage extends Adw.PreferencesPage {
         });
 
         const legalLabel = new Gtk.Label({
-            label: '<span size="small">This program comes with absolutely no warranty.\nSee the <a href="https://gnu.org/licenses/old-licenses/gpl-2.0.html">GNU General Public License, version 2 or later</a> for details.</span>',
+            label: '<span size="small">This program comes with absolutely no warranty.\nSee the <a href="https://www.gnu.org/licenses/gpl-3.0-standalone.html">GNU General Public License, version 3 or later</a> for details.</span>',
             use_markup: true,
             justify: Gtk.Justification.CENTER,
             wrap: true,
@@ -145,6 +153,22 @@ class AboutPage extends Adw.PreferencesPage {
         row.add_suffix(new Gtk.Label({
             label: value,
             selectable: true,
+        }));
+
+        return row;
+    }
+
+    _createLinkRow(title, url) {
+        const row = new Adw.ActionRow({
+            title,
+            activatable: false,
+        });
+
+        row.add_suffix(new Gtk.LinkButton({
+            icon_name: 'adw-external-link-symbolic',
+            uri: url,
+            tooltip_text: url,
+            valign: Gtk.Align.CENTER,
         }));
 
         return row;
