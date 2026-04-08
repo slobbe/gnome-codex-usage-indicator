@@ -84,10 +84,12 @@ class CodexUsageIndicator extends PanelMenu.Button {
     }
 
     _buildMenu() {
+        this._planItem = this._createPlanItem();
         this._fiveHourItem = this._createUsageItem('5 hour');
         this._weeklyItem = this._createUsageItem('weekly');
         this._footerItem = this._createFooterItem();
 
+        this.menu.addMenuItem(this._planItem);
         this.menu.addMenuItem(this._fiveHourItem);
         this.menu.addMenuItem(this._weeklyItem);
         this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
@@ -166,6 +168,36 @@ class CodexUsageIndicator extends PanelMenu.Button {
         item.barFill = barFill;
         item.percentValue = 0;
         item.detailLabel = detailLabel;
+
+        return item;
+    }
+
+    _createPlanItem() {
+        const item = new PopupMenu.PopupBaseMenuItem({
+            reactive: false,
+            can_focus: false,
+        });
+
+        const box = new St.BoxLayout({
+            x_expand: true,
+            style_class: 'cx-plan-row',
+        });
+
+        const spacer = new St.Widget({
+            x_expand: true,
+        });
+
+        const planLabel = new St.Label({
+            text: '--',
+            style_class: 'cx-plan-tag',
+            x_align: Clutter.ActorAlign.END,
+            y_align: Clutter.ActorAlign.CENTER,
+        });
+
+        box.add_child(spacer);
+        box.add_child(planLabel);
+        item.add_child(box);
+        item.planLabel = planLabel;
 
         return item;
     }
@@ -297,12 +329,14 @@ class CodexUsageIndicator extends PanelMenu.Button {
     _syncMenu() {
         if (!this._snapshot) {
             const fallback = this._errorMessage ?? 'Loading Codex usage...';
+            this._planItem.planLabel.text = '--';
             this._setUsageItem(this._fiveHourItem, '5 hour', fallback, 'resets in --', null);
             this._setUsageItem(this._weeklyItem, 'weekly', '--', 'resets in --', null);
             this._footerItem.updatedLabel.text = 'Last updated: --';
             return;
         }
 
+        this._planItem.planLabel.text = formatPlan(this._snapshot.subscription?.planType ?? this._snapshot.planType);
         this._setUsageItem(
             this._fiveHourItem,
             '5 hour',

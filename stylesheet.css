@@ -8,6 +8,17 @@
     spacing: 2px;
 }
 
+.cx-plan-row {
+    spacing: 12px;
+}
+
+.cx-plan-tag {
+    padding: 4px 10px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 999px;
+    font-size: 0.95em;
+}
+
 .cx-usage-heading-row {
     spacing: 12px;
 }
@@ -65,5 +76,6 @@
 }
 
 .cx-footer-button {
-    padding: 4px;
+    padding: 2px;
+    margin: 0;
 }
