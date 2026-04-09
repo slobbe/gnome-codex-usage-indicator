@@ -91,8 +91,8 @@ class CodexUsageIndicator extends PanelMenu.Button {
 
     _buildMenu() {
         this._headerItem = this._createHeaderItem();
-        this._fiveHourItem = this._createUsageItem('5 hour');
-        this._weeklyItem = this._createUsageItem('weekly');
+        this._fiveHourItem = this._createUsageItem('Session (5h)');
+        this._weeklyItem = this._createUsageItem('Weekly');
         this._footerItem = this._createFooterItem();
 
         this.menu.addMenuItem(this._headerItem);
@@ -413,8 +413,8 @@ class CodexUsageIndicator extends PanelMenu.Button {
         if (!this._snapshot) {
             const fallback = this._errorMessage ?? 'Loading Codex usage...';
             this._headerItem.datetimeLabel.text = '--';
-            this._setUsageItem(this._fiveHourItem, '5 hour', fallback, 'resets in --', null);
-            this._setUsageItem(this._weeklyItem, 'weekly', '--', 'resets in --', null);
+            this._setUsageItem(this._fiveHourItem, 'Session (5h)', fallback, 'resets in --', null);
+            this._setUsageItem(this._weeklyItem, 'Weekly', '--', 'resets in --', null);
             this._footerItem.planLabel.text = '--';
             return;
         }
@@ -422,14 +422,14 @@ class CodexUsageIndicator extends PanelMenu.Button {
         this._headerItem.datetimeLabel.text = formatTimestamp(this._snapshot.fetchedAt);
         this._setUsageItem(
             this._fiveHourItem,
-            '5 hour',
+            'Session (5h)',
             formatPercent(this._snapshot.fiveHour?.usedPercent),
             formatReset(this._snapshot.fiveHour, 'five-hour'),
             this._snapshot.fiveHour?.usedPercent
         );
         this._setUsageItem(
             this._weeklyItem,
-            'weekly',
+            'Weekly',
             formatPercent(this._snapshot.weekly?.usedPercent),
             formatReset(this._snapshot.weekly, 'weekly'),
             this._snapshot.weekly?.usedPercent
