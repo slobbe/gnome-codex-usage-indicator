@@ -109,7 +109,7 @@ class CodexUsageIndicator extends PanelMenu.Button {
     _buildMenu() {
         this._headerItem = this._createHeaderItem();
         this._fiveHourItem = this._createUsageItem('Session (5h)');
-        this._weeklyItem = this._createUsageItem('Weekly');
+        this._weeklyItem = this._createUsageItem('Week');
         this._footerItem = this._createFooterItem();
 
         this.menu.addMenuItem(this._headerItem);
@@ -265,12 +265,6 @@ class CodexUsageIndicator extends PanelMenu.Button {
             style_class: 'cx-header-row',
         });
 
-        const titleLabel = new St.Label({
-            text: 'Last updated',
-            x_expand: true,
-            style_class: 'cx-footer-label',
-        });
-
         const refreshButton = new St.Button({
             child: new St.Icon({
                 icon_name: 'view-refresh-symbolic',
@@ -290,13 +284,13 @@ class CodexUsageIndicator extends PanelMenu.Button {
         const datetimeLabel = new St.Label({
             text: '--',
             x_expand: true,
+            y_align: Clutter.ActorAlign.CENTER,
             style_class: 'cx-header-detail',
         });
 
-        topRow.add_child(titleLabel);
+        topRow.add_child(datetimeLabel);
         topRow.add_child(refreshButton);
         box.add_child(topRow);
-        box.add_child(datetimeLabel);
         item.add_child(box);
         item.datetimeLabel = datetimeLabel;
         item.refreshIcon = refreshIcon;
@@ -505,7 +499,7 @@ class CodexUsageIndicator extends PanelMenu.Button {
             const fallback = this._errorMessage ?? 'Loading Codex usage...';
             this._headerItem.datetimeLabel.text = '--';
             this._setUsageItem(this._fiveHourItem, 'Session (5h)', fallback, 'resets in --', null);
-            this._setUsageItem(this._weeklyItem, 'Weekly', '--', 'resets in --', null);
+            this._setUsageItem(this._weeklyItem, 'Week', '--', 'resets in --', null);
             this._footerItem.planLabel.text = '--';
             return;
         }
@@ -520,7 +514,7 @@ class CodexUsageIndicator extends PanelMenu.Button {
         );
         this._setUsageItem(
             this._weeklyItem,
-            'Weekly',
+            'Week',
             formatPercent(this._snapshot.weekly?.usedPercent),
             formatReset(this._snapshot.weekly, 'weekly'),
             this._snapshot.weekly?.usedPercent
