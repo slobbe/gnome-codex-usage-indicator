@@ -18,9 +18,14 @@ class DisplayPage extends Adw.PreferencesPage {
             icon_name: 'preferences-system-symbolic',
         });
 
-        const group = new Adw.PreferencesGroup({
+        const topBarGroup = new Adw.PreferencesGroup({
             title: 'Top Bar',
             description: 'Choose what the GNOME top bar shows and which usage windows are included.',
+        });
+
+        const refreshGroup = new Adw.PreferencesGroup({
+            title: 'Refresh',
+            description: 'Control how often the extension refreshes usage data in the background.',
         });
 
         const topBarStyleRow = new Adw.ComboRow({
@@ -29,7 +34,7 @@ class DisplayPage extends Adw.PreferencesPage {
             model: Gtk.StringList.new(['Percentages', 'Progress bars']),
             selected: settings.get_string(SETTINGS_TOP_BAR_DISPLAY_MODE) === 'bars' ? 1 : 0,
         });
-        group.add(topBarStyleRow);
+        topBarGroup.add(topBarStyleRow);
 
         topBarStyleRow.connect('notify::selected', () => {
             settings.set_string(
@@ -48,7 +53,7 @@ class DisplayPage extends Adw.PreferencesPage {
             subtitle: 'Displays the current 5-hour window percentage.',
             active: settings.get_boolean(SETTINGS_SHOW_FIVE_HOUR),
         });
-        group.add(fiveHourRow);
+        topBarGroup.add(fiveHourRow);
         settings.bind(
             SETTINGS_SHOW_FIVE_HOUR,
             fiveHourRow,
@@ -61,7 +66,7 @@ class DisplayPage extends Adw.PreferencesPage {
             subtitle: 'Displays the current weekly window percentage.',
             active: settings.get_boolean(SETTINGS_SHOW_WEEKLY),
         });
-        group.add(weeklyRow);
+        topBarGroup.add(weeklyRow);
         settings.bind(
             SETTINGS_SHOW_WEEKLY,
             weeklyRow,
@@ -84,7 +89,7 @@ class DisplayPage extends Adw.PreferencesPage {
             climb_rate: 1,
             digits: 0,
         });
-        group.add(refreshIntervalRow);
+        refreshGroup.add(refreshIntervalRow);
 
         refreshIntervalRow.connect('notify::value', () => {
             settings.set_uint(
@@ -97,7 +102,8 @@ class DisplayPage extends Adw.PreferencesPage {
             refreshIntervalRow.value = settings.get_uint(SETTINGS_BACKGROUND_REFRESH_INTERVAL_MINUTES);
         });
 
-        this.add(group);
+        this.add(topBarGroup);
+        this.add(refreshGroup);
     }
 });
 
