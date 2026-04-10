@@ -622,8 +622,10 @@ function formatTimestamp(value) {
 
     try {
         return new Intl.DateTimeFormat(undefined, {
-            dateStyle: 'medium',
-            timeStyle: 'short',
+            day: 'numeric',
+            month: 'short',
+            hour: 'numeric',
+            minute: '2-digit',
         }).format(new Date(value));
     } catch (_error) {
         return '--';
