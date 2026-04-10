@@ -2,6 +2,9 @@
 
 Monitor your Codex usage directly from the GNOME top bar.
 
+[![GitHub Release](https://img.shields.io/github/v/release/slobbe/gnome-codex-usage-indicator?style=flat-square&color=royalblue)](https://github.com/slobbe/gnome-codex-usage-indicator/releases/latest)
+[![GitHub License](https://img.shields.io/github/license/slobbe/gnome-codex-usage-indicator?style=flat-square&color=teal)](/LICENSE)
+
 > Inspired by [CodexBar](https://github.com/steipete/CodexBar) by [Peter Steinberger](https://github.com/steipete), adapted for GNOME.
 
 ## Features
