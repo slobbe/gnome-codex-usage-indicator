@@ -444,13 +444,29 @@ class CodexUsageIndicator extends PanelMenu.Button {
         const showWeekly = this._settings.get_boolean(SETTINGS_SHOW_WEEKLY);
         const displayMode = this._settings.get_string(SETTINGS_TOP_BAR_DISPLAY_MODE);
         const includeFiveHour = showFiveHour || !showWeekly;
+        const showUnifiedBar = displayMode === 'unified' && this._snapshot;
+        const showSplitBars = displayMode === 'bars' && this._snapshot;
 
-        this._panelFiveHourBar.barTrack.visible = includeFiveHour;
-        this._panelWeeklyBar.barTrack.visible = showWeekly;
+        if (showUnifiedBar) {
+            this._panelFiveHourBar.barTrack.visible = true;
+            this._panelWeeklyBar.barTrack.visible = false;
+        } else {
+            this._panelFiveHourBar.barTrack.visible = includeFiveHour;
+            this._panelWeeklyBar.barTrack.visible = showWeekly;
+        }
 
         if (this._snapshot) {
-            this._panelFiveHourBar.percentValue = normalizePercent(this._snapshot.fiveHour?.usedPercent);
-            this._panelWeeklyBar.percentValue = normalizePercent(this._snapshot.weekly?.usedPercent);
+            if (showUnifiedBar) {
+                this._panelFiveHourBar.percentValue = calculateUnifiedPercent(
+                    this._snapshot.fiveHour?.usedPercent,
+                    this._snapshot.weekly?.usedPercent
+                );
+                this._panelWeeklyBar.percentValue = 0;
+            } else {
+                this._panelFiveHourBar.percentValue = normalizePercent(this._snapshot.fiveHour?.usedPercent);
+                this._panelWeeklyBar.percentValue = normalizePercent(this._snapshot.weekly?.usedPercent);
+            }
+
             this._updateUsageBarColor(this._panelFiveHourBar);
             this._updateUsageBarColor(this._panelWeeklyBar);
             this._updateUsageBar(this._panelFiveHourBar);
@@ -462,11 +478,10 @@ class CodexUsageIndicator extends PanelMenu.Button {
             this._updateUsageBar(this._panelWeeklyBar);
         }
 
-        const showPanelBars = displayMode === 'bars' && this._snapshot;
-        this._panelBars.visible = showPanelBars;
-        this._label.visible = !showPanelBars;
+        this._panelBars.visible = showSplitBars || showUnifiedBar;
+        this._label.visible = !(showSplitBars || showUnifiedBar);
 
-        if (showPanelBars)
+        if (showSplitBars || showUnifiedBar)
             return;
 
         if (!this._snapshot) {
@@ -656,6 +671,22 @@ function formatPlan(value) {
         .filter(Boolean)
         .map(part => `${part[0].toUpperCase()}${part.slice(1)}`)
         .join(' ');
+}
+
+function calculateUnifiedPercent(...values) {
+    const normalizedValues = values
+        .filter(Number.isFinite)
+        .map(value => normalizePercent(value) / 100);
+
+    if (normalizedValues.length === 0)
+        return 0;
+
+    const remainingCapacity = normalizedValues.reduce(
+        (remaining, value) => remaining * (1 - value),
+        1
+    );
+
+    return Math.round((1 - remainingCapacity) * 100);
 }
 
 function normalizePercent(value) {

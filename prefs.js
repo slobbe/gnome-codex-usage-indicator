@@ -30,22 +30,22 @@ class DisplayPage extends Adw.PreferencesPage {
 
         const topBarStyleRow = new Adw.ComboRow({
             title: 'Top bar style',
-            subtitle: 'Choose whether the GNOME top bar shows percentages or compact progress bars.',
-            model: Gtk.StringList.new(['Percentages', 'Progress bars']),
-            selected: settings.get_string(SETTINGS_TOP_BAR_DISPLAY_MODE) === 'bars' ? 1 : 0,
+            subtitle: 'Choose whether the GNOME top bar shows percentages, split progress bars, or a unified bar that combines Session and Week usage.',
+            model: Gtk.StringList.new(['Percentages', 'Progress bars', 'Unified bar']),
+            selected: getTopBarDisplayModeIndex(settings.get_string(SETTINGS_TOP_BAR_DISPLAY_MODE)),
         });
         topBarGroup.add(topBarStyleRow);
 
         topBarStyleRow.connect('notify::selected', () => {
             settings.set_string(
                 SETTINGS_TOP_BAR_DISPLAY_MODE,
-                topBarStyleRow.selected === 1 ? 'bars' : 'percentages'
+                getTopBarDisplayModeValue(topBarStyleRow.selected)
             );
         });
 
         settings.connect(`changed::${SETTINGS_TOP_BAR_DISPLAY_MODE}`, () => {
             topBarStyleRow.selected =
-                settings.get_string(SETTINGS_TOP_BAR_DISPLAY_MODE) === 'bars' ? 1 : 0;
+                getTopBarDisplayModeIndex(settings.get_string(SETTINGS_TOP_BAR_DISPLAY_MODE));
         });
 
         const fiveHourRow = new Adw.SwitchRow({
@@ -236,6 +236,28 @@ function formatShellVersions(versions) {
         return '--';
 
     return versions.join(', ');
+}
+
+function getTopBarDisplayModeIndex(value) {
+    switch (value) {
+    case 'bars':
+        return 1;
+    case 'unified':
+        return 2;
+    default:
+        return 0;
+    }
+}
+
+function getTopBarDisplayModeValue(selected) {
+    switch (selected) {
+    case 1:
+        return 'bars';
+    case 2:
+        return 'unified';
+    default:
+        return 'percentages';
+    }
 }
 
 export default class AIUsageIndicatorPreferences extends ExtensionPreferences {

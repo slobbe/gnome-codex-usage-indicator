@@ -14,10 +14,11 @@
     <key name="top-bar-display-mode" type="s">
       <default>'percentages'</default>
       <summary>Top bar display mode</summary>
-      <description>Controls whether the top bar shows usage percentages or compact progress bars.</description>
+      <description>Controls whether the top bar shows usage percentages, split progress bars, or a unified progress bar.</description>
       <choices>
         <choice value='percentages'/>
         <choice value='bars'/>
+        <choice value='unified'/>
       </choices>
     </key>
     <key name="background-refresh-interval-minutes" type="u">
