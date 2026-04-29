@@ -6,6 +6,10 @@ const CODEX_AUTH_PATH = `${GLib.get_home_dir()}/.codex/auth.json`;
 const CODEX_USAGE_URL = 'https://chatgpt.com/backend-api/wham/usage';
 const CACHE_DIR = GLib.build_filenamev([GLib.get_user_cache_dir(), 'codex-usage-indicator']);
 const CACHE_PATH = GLib.build_filenamev([CACHE_DIR, 'snapshot.json']);
+const HISTORY_PATH = GLib.build_filenamev([CACHE_DIR, "usage-history.csv"]);
+const HISTORY_RETENTION_DAYS = 90;
+const HISTORY_RETENTION_MS = HISTORY_RETENTION_DAYS * 24 * 60 * 60 * 1000;
+const HISTORY_HEADER = "timestamp,session_used_percent,weekly_used_percent";
 
 Gio._promisify(Gio.File.prototype, 'load_contents_async');
 Gio._promisify(Soup.Session.prototype, 'send_and_read_async');
@@ -53,6 +57,7 @@ export async function fetchCodexUsageSnapshot() {
     const snapshot = buildSnapshot(auth, usage, new Date().toISOString());
 
     writeCachedUsageSnapshot(snapshot);
+    writeUsageHistorySample(snapshot);
 
     return snapshot;
 }
@@ -64,7 +69,7 @@ export function readCachedUsageSnapshot() {
         if (!success)
             return null;
 
-        const raw = new TextDecoder('utf-8').decode(contents);
+        const raw = new TextDecoder("utf-8").decode(contents);
         const parsed = JSON.parse(raw);
 
         return normalizeSnapshot(parsed);
@@ -79,6 +84,126 @@ function writeCachedUsageSnapshot(snapshot) {
         GLib.file_set_contents(CACHE_PATH, JSON.stringify(snapshot));
     } catch (_error) {
     }
+}
+
+function writeUsageHistorySample(snapshot) {
+    try {
+        const timestamp = snapshot?.fetchedAt;
+
+        if (!timestamp)
+            return;
+
+        const rows = readUsageHistoryRows();
+        rows.push({
+            timestamp,
+            sessionUsedPercent: snapshot.fiveHour?.usedPercent ?? null,
+            weeklyUsedPercent: snapshot.weekly?.usedPercent ?? null,
+        });
+
+        const retainedRows = pruneUsageHistoryRows(rows, new Date(timestamp));
+
+        GLib.mkdir_with_parents(CACHE_DIR, 0o755);
+        GLib.file_set_contents(HISTORY_PATH, serializeUsageHistoryRows(retainedRows));
+    } catch (_error) {
+    }
+}
+
+function readUsageHistoryRows() {
+    try {
+        const [success, contents] = GLib.file_get_contents(HISTORY_PATH);
+
+        if (!success)
+            return [];
+
+        const raw = new TextDecoder("utf-8").decode(contents);
+
+        return raw
+            .split(/\r?\n/)
+            .slice(1)
+            .filter(line => line.length > 0)
+            .map(parseCsvLine)
+            .filter(row => row !== null);
+    } catch (_error) {
+        return [];
+    }
+}
+
+function pruneUsageHistoryRows(rows, now) {
+    const nowTime = now instanceof Date ? now.getTime() : Date.now();
+    const cutoffTime = nowTime - HISTORY_RETENTION_MS;
+
+    return rows.filter(row => {
+        const rowTime = new Date(row.timestamp).getTime();
+
+        return Number.isFinite(rowTime) && rowTime >= cutoffTime;
+    });
+}
+
+function serializeUsageHistoryRows(rows) {
+    const lines = rows.map(row => [
+        escapeCsvValue(row.timestamp),
+        escapeCsvValue(row.sessionUsedPercent),
+        escapeCsvValue(row.weeklyUsedPercent),
+    ].join(","));
+
+    return `${HISTORY_HEADER}\n${lines.join("\n")}${lines.length > 0 ? "\n" : ""}`;
+}
+
+function escapeCsvValue(value) {
+    if (value === null || value === undefined)
+        return "";
+
+    const text = value.toString();
+
+    if (!/[",\r\n]/.test(text))
+        return text;
+
+    return `"${text.replace(/"/g, "\"\"")}"`;
+}
+
+function parseCsvLine(line) {
+    const values = [];
+    let current = "";
+    let inQuotes = false;
+
+    for (let index = 0; index < line.length; index++) {
+        const char = line[index];
+        const nextChar = line[index + 1];
+
+        if (char === "\"") {
+            if (inQuotes && nextChar === "\"") {
+                current += "\"";
+                index++;
+            } else {
+                inQuotes = !inQuotes;
+            }
+        } else if (char === "," && !inQuotes) {
+            values.push(current);
+            current = "";
+        } else {
+            current += char;
+        }
+    }
+
+    values.push(current);
+
+    if (values.length !== 3)
+        return null;
+
+    return {
+        timestamp: values[0],
+        sessionUsedPercent: parseOptionalNumber(values[1]),
+        weeklyUsedPercent: parseOptionalNumber(values[2]),
+    };
+}
+
+function parseOptionalNumber(value) {
+    if (value === "")
+        return null;
+
+    const number = Number(value);
+
+    return Number.isFinite(number) ? number : null;
 }
 
 function buildSnapshot(auth, usage, fetchedAt) {

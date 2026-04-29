@@ -13,12 +13,14 @@ Monitor your Codex usage directly from the GNOME top bar.
 - Shows 5-hour usage, weekly usage, or both in the top bar
 - Choose between raw percentages, progress bars, or unified _combined-pressure_ bar
 - Supports manual refresh and configurable background refresh intervals
+- Records successful usage checks to a local CSV history file
 
 ## Install
 
 > [!NOTE]
 > Requires the Codex CLI and an active login on the same machine.
 > The extension reads your local local auth credentials from `~/.codex/auth.json` to fetch usage data from `https://chatgpt.com/backend-api/wham/usage`.
+> Successful checks are recorded in `${XDG_CACHE_HOME:-~/.cache}/codex-usage-indicator/usage-history.csv` with `timestamp`, `session_used_percent`, and `weekly_used_percent` columns. The extension keeps 90 days of history.
 
 1. Download the [latest release](https://github.com/slobbe/gnome-codex-usage-indicator/releases/latest) zip.
 2. Install and enable the extension with:
