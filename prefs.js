@@ -13,6 +13,7 @@ const SETTINGS_BACKGROUND_REFRESH_INTERVAL_MINUTES = 'background-refresh-interva
 const HISTORY_SESSION_COLOR = [0.29, 0.76, 0.43, 1];
 const HISTORY_WEEK_COLOR = [0.22, 0.55, 0.90, 1];
 const HISTORY_GRID_COLOR = [0.5, 0.5, 0.5, 0.25];
+const HISTORY_LABEL_COLOR = [0.5, 0.5, 0.5, 0.8];
 
 const DisplayPage = GObject.registerClass(
 class DisplayPage extends Adw.PreferencesPage {
@@ -395,6 +396,7 @@ function drawHistoryChart(cr, width, height, rows) {
         cr.moveTo(padding.left, y);
         cr.lineTo(width - padding.right, y);
         cr.stroke();
+        drawYAxisLabel(cr, `${percent}%`, padding.left - 6, y);
     }
 
     drawHistorySeries(
@@ -419,6 +421,18 @@ function drawHistoryChart(cr, width, height, rows) {
         minTime,
         timeSpan
     );
+}
+
+function drawYAxisLabel(cr, label, rightX, centerY) {
+    cr.save();
+    cr.selectFontFace('Sans', 0, 0);
+    cr.setFontSize(10);
+
+    const extents = cr.textExtents(label);
+    cr.setSourceRGBA(...HISTORY_LABEL_COLOR);
+    cr.moveTo(rightX - extents.width, centerY + (extents.height / 2));
+    cr.showText(label);
+    cr.restore();
 }
 
 function drawHistorySeries(cr, rows, key, color, padding, chartWidth, chartHeight, minTime, timeSpan) {
