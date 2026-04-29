@@ -175,7 +175,7 @@ class HistoryPage extends Adw.PreferencesPage {
         historyPathBox.add_css_class('dim-label');
 
         const historyPathPrefixLabel = new Gtk.Label({
-            label: 'Full 90-day CSV history:',
+            label: 'Full 90-day history:',
             halign: Gtk.Align.START,
             xalign: 0,
         });
