@@ -26,7 +26,10 @@ pack_with_zip() {
 
     require_command zip
     staging_dir="$(mktemp -d)"
-    trap "rm -rf -- $(printf '%q' "${staging_dir}")" EXIT
+    cleanup_staging_dir() {
+        rm -rf -- "${staging_dir}"
+    }
+    trap cleanup_staging_dir EXIT
 
     printf 'Packing extension bundle with zip fallback...\n'
 
