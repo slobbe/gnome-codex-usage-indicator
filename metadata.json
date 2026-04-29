@@ -8,5 +8,5 @@
   "settings-schema": "org.gnome.shell.extensions.codex-usage",
   "url": "https://github.com/slobbe/gnome-codex-usage-indicator",
   "license": "GNU General Public License v3.0 or later",
-  "version-name": "0.3.1"
+  "version-name": "0.4.0"
 }
