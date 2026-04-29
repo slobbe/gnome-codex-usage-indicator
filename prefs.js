@@ -1,5 +1,6 @@
 import Adw from 'gi://Adw';
 import Gio from 'gi://Gio';
+import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
 import Gtk from 'gi://Gtk';
 
@@ -15,6 +16,11 @@ const HISTORY_WEEK_COLOR = [0.22, 0.55, 0.90, 1];
 const HISTORY_GRID_COLOR = [0.5, 0.5, 0.5, 0.25];
 const HISTORY_LABEL_COLOR = [0.5, 0.5, 0.5, 0.8];
 const HISTORY_CHART_DAYS = 30;
+const HISTORY_CSV_PATH = GLib.build_filenamev([
+    GLib.get_user_cache_dir(),
+    'codex-usage-indicator',
+    'usage-history.csv',
+]);
 
 const DisplayPage = GObject.registerClass(
 class DisplayPage extends Adw.PreferencesPage {
@@ -161,9 +167,19 @@ class HistoryPage extends Adw.PreferencesPage {
         legend.append(createLegendItem('Session', HISTORY_SESSION_COLOR));
         legend.append(createLegendItem('Week', HISTORY_WEEK_COLOR));
 
+        const historyPathLabel = new Gtk.Label({
+            label: `Full 90-day CSV history: ${HISTORY_CSV_PATH}`,
+            halign: Gtk.Align.START,
+            selectable: true,
+            wrap: true,
+            xalign: 0,
+        });
+        historyPathLabel.add_css_class('dim-label');
+
         box.append(this._statusLabel);
         box.append(this._drawingArea);
         box.append(legend);
+        box.append(historyPathLabel);
         historyGroup.add(box);
         this.add(historyGroup);
     }
@@ -365,7 +381,7 @@ function drawHistoryChart(cr, width, height, rows) {
     const padding = {
         top: 12,
         right: 12,
-        bottom: 20,
+        bottom: 34,
         left: 34,
     };
     const drawableRows = rows
@@ -400,6 +416,8 @@ function drawHistoryChart(cr, width, height, rows) {
         drawYAxisLabel(cr, `${percent}%`, padding.left - 6, y);
     }
 
+    drawXAxisLabels(cr, minTime, maxTime, padding, chartWidth, chartHeight);
+
     drawHistorySeries(
         cr,
         drawableRows,
@@ -422,6 +440,48 @@ function drawHistoryChart(cr, width, height, rows) {
         minTime,
         timeSpan
     );
+}
+
+function drawXAxisLabels(cr, minTime, maxTime, padding, chartWidth, chartHeight) {
+    const points = [
+        {time: minTime, x: padding.left, align: 'start'},
+        {time: minTime + ((maxTime - minTime) / 2), x: padding.left + (chartWidth / 2), align: 'center'},
+        {time: maxTime, x: padding.left + chartWidth, align: 'end'},
+    ];
+    const y = padding.top + chartHeight + 18;
+
+    for (const point of points)
+        drawXAxisLabel(cr, formatAxisDate(point.time), point.x, y, point.align);
+}
+
+function drawXAxisLabel(cr, label, x, y, align) {
+    cr.save();
+    cr.selectFontFace('Sans', 0, 0);
+    cr.setFontSize(10);
+
+    const extents = cr.textExtents(label);
+    let labelX = x;
+
+    if (align === 'center')
+        labelX -= extents.width / 2;
+    else if (align === 'end')
+        labelX -= extents.width;
+
+    cr.setSourceRGBA(...HISTORY_LABEL_COLOR);
+    cr.moveTo(labelX, y);
+    cr.showText(label);
+    cr.restore();
+}
+
+function formatAxisDate(value) {
+    try {
+        return new Intl.DateTimeFormat(undefined, {
+            month: 'short',
+            day: 'numeric',
+        }).format(new Date(value));
+    } catch (_error) {
+        return '--';
+    }
 }
 
 function drawYAxisLabel(cr, label, rightX, centerY) {
