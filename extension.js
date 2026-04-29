@@ -32,9 +32,16 @@ const SETTINGS_SHOW_WEEKLY = 'show-weekly';
 const SETTINGS_TOP_BAR_DISPLAY_MODE = 'top-bar-display-mode';
 const SETTINGS_BACKGROUND_REFRESH_INTERVAL_MINUTES = 'background-refresh-interval-minutes';
 const MIN_REFRESH_INTERVAL_MINUTES = 0;
-const MIN_PREDICTION_SAMPLES = 4;
-const MIN_PREDICTION_TIMESPAN_MS = 15 * 60 * 1000;
-const MIN_PREDICTION_GROWTH_PERCENT = 1;
+const SESSION_PREDICTION_REQUIREMENTS = {
+    minSamples: 4,
+    minTimespanMs: 15 * 60 * 1000,
+    minGrowthPercent: 1,
+};
+const WEEKLY_PREDICTION_REQUIREMENTS = {
+    minSamples: 12,
+    minTimespanMs: 6 * 60 * 60 * 1000,
+    minGrowthPercent: 2,
+};
 
 class CodexUsageIndicator extends PanelMenu.Button {
     static {
@@ -573,14 +580,16 @@ class CodexUsageIndicator extends PanelMenu.Button {
             this._snapshot,
             this._historyRows,
             'sessionUsedPercent',
-            now
+            now,
+            SESSION_PREDICTION_REQUIREMENTS
         );
         const weeklyPrediction = predictLimitHit(
             this._snapshot.weekly,
             this._snapshot,
             this._historyRows,
             'weeklyUsedPercent',
-            now
+            now,
+            WEEKLY_PREDICTION_REQUIREMENTS
         );
 
         this._headerItem.datetimeLabel.text = formatUpdatedAt(this._snapshot.fetchedAt);
@@ -752,7 +761,7 @@ function formatUpdatedAt(value) {
     }
 }
 
-function predictLimitHit(window, snapshot, historyRows, key, now = Date.now()) {
+function predictLimitHit(window, snapshot, historyRows, key, now = Date.now(), requirements = SESSION_PREDICTION_REQUIREMENTS) {
     if (!window)
         return createPrediction('unavailable');
 
@@ -808,7 +817,7 @@ function predictLimitHit(window, snapshot, historyRows, key, now = Date.now()) {
         dedupedSamples.push(sample);
     }
 
-    if (dedupedSamples.length < MIN_PREDICTION_SAMPLES)
+    if (dedupedSamples.length < requirements.minSamples)
         return createPrediction('unavailable');
 
     const first = dedupedSamples[0];
@@ -816,7 +825,7 @@ function predictLimitHit(window, snapshot, historyRows, key, now = Date.now()) {
     const elapsedMs = latest.time - first.time;
     const percentGrowth = latest.percent - first.percent;
 
-    if (elapsedMs < MIN_PREDICTION_TIMESPAN_MS || percentGrowth < MIN_PREDICTION_GROWTH_PERCENT)
+    if (elapsedMs < requirements.minTimespanMs || percentGrowth < requirements.minGrowthPercent)
         return createPrediction('unavailable');
 
     const percentPerMs = calculateTrendSlope(dedupedSamples);
