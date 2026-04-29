@@ -167,19 +167,32 @@ class HistoryPage extends Adw.PreferencesPage {
         legend.append(createLegendItem('Session', HISTORY_SESSION_COLOR));
         legend.append(createLegendItem('Week', HISTORY_WEEK_COLOR));
 
+        const historyPathBox = new Gtk.Box({
+            orientation: Gtk.Orientation.HORIZONTAL,
+            spacing: 4,
+            halign: Gtk.Align.START,
+        });
+        historyPathBox.add_css_class('dim-label');
+
+        const historyPathPrefixLabel = new Gtk.Label({
+            label: 'Full 90-day CSV history:',
+            halign: Gtk.Align.START,
+            xalign: 0,
+        });
         const historyPathLabel = new Gtk.Label({
-            label: `Full 90-day CSV history: ${HISTORY_CSV_PATH}`,
+            label: HISTORY_CSV_PATH,
             halign: Gtk.Align.START,
             selectable: true,
             wrap: true,
             xalign: 0,
         });
-        historyPathLabel.add_css_class('dim-label');
+        historyPathBox.append(historyPathPrefixLabel);
+        historyPathBox.append(historyPathLabel);
 
         box.append(this._statusLabel);
         box.append(this._drawingArea);
         box.append(legend);
-        box.append(historyPathLabel);
+        box.append(historyPathBox);
         historyGroup.add(box);
         this.add(historyGroup);
     }
