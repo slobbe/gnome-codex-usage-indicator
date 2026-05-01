@@ -67,7 +67,7 @@ class CodexMeterIndicator extends PanelMenu.Button {
         });
 
         this._prefixLabel = new St.Label({
-            text: "CM",
+            text: "CX",
             y_align: Clutter.ActorAlign.CENTER,
             style_class: 'cx-panel-prefix',
         });
