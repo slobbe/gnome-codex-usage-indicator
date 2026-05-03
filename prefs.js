@@ -149,7 +149,7 @@ const AboutPage = GObject.registerClass(
       const description = new Gtk.Label({
         label:
           metadata.description ??
-          "Show current Codex quota usage in the GNOME top bar",
+          "Show current Codex quota usage in the top panel",
         justify: Gtk.Justification.CENTER,
         wrap: true,
         max_width_chars: 48,

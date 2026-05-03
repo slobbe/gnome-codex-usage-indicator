@@ -1,6 +1,6 @@
 # Codex Meter GNOME Extension
 
-Monitor your Codex usage directly from the GNOME top bar.
+Monitor your Codex usage directly from the GNOME top panel.
 
 [![GitHub Release](https://img.shields.io/github/v/release/slobbe/codex-meter?style=flat-square&color=royalblue)](https://github.com/slobbe/codex-meter/releases/latest)
 [![GitHub License](https://img.shields.io/github/license/slobbe/codex-meter?style=flat-square&color=teal)](/LICENSE)
