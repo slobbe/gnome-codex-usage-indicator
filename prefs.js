@@ -1,6 +1,5 @@
 import Adw from "gi://Adw";
 import Gio from "gi://Gio";
-import GLib from "gi://GLib";
 import GObject from "gi://GObject";
 import Gtk from "gi://Gtk";
 
@@ -23,7 +22,7 @@ const DisplayPage = GObject.registerClass(
       const topBarGroup = new Adw.PreferencesGroup({
         title: "Top Bar",
         description:
-          "Choose what the GNOME top bar shows and which usage windows are included.",
+          "Choose what the top bar shows.",
       });
 
       const refreshGroup = new Adw.PreferencesGroup({
@@ -34,8 +33,6 @@ const DisplayPage = GObject.registerClass(
 
       const topBarStyleRow = new Adw.ComboRow({
         title: "Top bar style",
-        subtitle:
-          "Choose whether the GNOME top bar shows percentages, split progress bars, or a unified bar that combines Session and Week usage.",
         model: Gtk.StringList.new([
           "Percentages",
           "Progress bars",
@@ -61,8 +58,7 @@ const DisplayPage = GObject.registerClass(
       });
 
       const fiveHourRow = new Adw.SwitchRow({
-        title: "Show 5-hour usage",
-        subtitle: "Displays the current 5-hour window percentage.",
+        title: "Show session (5h) usage",
         active: settings.get_boolean(SETTINGS_SHOW_FIVE_HOUR),
       });
       topBarGroup.add(fiveHourRow);
@@ -75,7 +71,6 @@ const DisplayPage = GObject.registerClass(
 
       const weeklyRow = new Adw.SwitchRow({
         title: "Show weekly usage",
-        subtitle: "Displays the current weekly window percentage.",
         active: settings.get_boolean(SETTINGS_SHOW_WEEKLY),
       });
       topBarGroup.add(weeklyRow);
@@ -95,9 +90,9 @@ const DisplayPage = GObject.registerClass(
       });
 
       const refreshIntervalRow = new Adw.SpinRow({
-        title: "Background refresh interval",
+        title: "Background refresh interval (min)",
         subtitle:
-          "How often usage data refreshes in the background, in minutes. Set to 0 for manual refresh only.",
+          "Set to 0 for manual refresh only.",
         adjustment: intervalAdjustment,
         climb_rate: 1,
         digits: 0,
