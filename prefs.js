@@ -15,7 +15,7 @@ const DisplayPage = GObject.registerClass(
   class DisplayPage extends Adw.PreferencesPage {
     _init(settings) {
       super._init({
-        title: "Display",
+        title: "Preferences",
         icon_name: "preferences-system-symbolic",
       });
 
