@@ -7,8 +7,6 @@ const CODEX_USAGE_URL = 'https://chatgpt.com/backend-api/wham/usage';
 const CACHE_DIR = GLib.build_filenamev([GLib.get_user_cache_dir(), "codex-meter"]);
 const CACHE_PATH = GLib.build_filenamev([CACHE_DIR, 'snapshot.json']);
 const HISTORY_PATH = GLib.build_filenamev([CACHE_DIR, "usage-history.csv"]);
-const HISTORY_RETENTION_DAYS = 90;
-const HISTORY_RETENTION_MS = HISTORY_RETENTION_DAYS * 24 * 60 * 60 * 1000;
 const HISTORY_HEADER = "timestamp,session_used_percent,weekly_used_percent";
 
 Gio._promisify(Gio.File.prototype, 'load_contents_async');
@@ -113,8 +111,6 @@ function writeUsageHistorySample(snapshot) {
             weeklyUsedPercent: snapshot.weekly?.usedPercent ?? null,
         });
 
-        const retainedRows = pruneUsageHistoryRows(rows, new Date(timestamp));
-
         GLib.mkdir_with_parents(CACHE_DIR, 0o755);
         GLib.file_set_contents(HISTORY_PATH, serializeUsageHistoryRows(retainedRows));
     } catch (_error) {
@@ -139,17 +135,6 @@ function readUsageHistoryRows() {
     } catch (_error) {
         return [];
     }
-}
-
-function pruneUsageHistoryRows(rows, now) {
-    const nowTime = now instanceof Date ? now.getTime() : Date.now();
-    const cutoffTime = nowTime - HISTORY_RETENTION_MS;
-
-    return rows.filter(row => {
-        const rowTime = new Date(row.timestamp).getTime();
-
-        return Number.isFinite(rowTime) && rowTime >= cutoffTime;
-    });
 }
 
 function serializeUsageHistoryRows(rows) {
